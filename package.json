@@ -3,13 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "nodemon server.js",
     "build": "next build",
-    "start": "next start"
+    "start": "NODE_ENV=production node server.js"
   },
   "dependencies": {
+    "@chakra-ui/react": "^1.0.1",
+    "@emotion/react": "^11.1.1",
+    "@emotion/styled": "^11.0.0",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
     "next": "10.0.2",
+    "nodemon": "^2.0.6",
     "react": "17.0.1",
-    "react-dom": "17.0.1"
+    "react-dom": "17.0.1",
+    "uuid": "^8.3.1"
   }
 }

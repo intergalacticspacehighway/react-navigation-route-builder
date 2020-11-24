@@ -1,65 +1,80 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import Head from "next/head";
+import { useMemo, useState } from "react";
+import { AddLayout } from "../components/AddLayout";
+import { Layout } from "../components/Layout";
+import { v4 as uuidv4 } from "uuid";
+import { Box, Button, Flex } from "@chakra-ui/react";
+
+const dummyTree = {
+  type: "root",
+  id: "root",
+  children: [],
+};
+
+const findTreeNode = (tree, id) => {
+  if (tree.id === id) {
+    return tree;
+  }
+
+  for (let i = 0; i < tree.children.length; i++) {
+    const childNode = findTreeNode(tree.children[i], id);
+    if (childNode) {
+      return childNode;
+    }
+  }
+};
 
 export default function Home() {
+  const [treeData, setTreeData] = useState(dummyTree);
+  const [selectedParent, setSelectedParent] = useState(dummyTree.id);
+  const parent = useMemo(() => {
+    const node = findTreeNode(treeData, selectedParent);
+    return node;
+  }, [selectedParent, treeData]);
+
+  const onAddNode = (node) => {
+    const parent = findTreeNode(treeData, selectedParent);
+    parent.children = parent.children.concat({
+      ...node,
+      children: [],
+      id: uuidv4(),
+    });
+
+    setTreeData({
+      ...treeData,
+    });
+  };
+
+  const handleSubmit = async () => {
+    const res = await fetch("/api/generate", {
+      method: "POST",
+      body: JSON.stringify(treeData),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log({ res });
+  };
+
   return (
-    <div className={styles.container}>
+    <div>
       <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>RN builder</title>
       </Head>
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
+      <Flex flexDirection="row" justify="space-between">
+        <Layout
+          data={treeData}
+          selectedParent={selectedParent}
+          onSelectParent={(parent) => setSelectedParent(parent)}
+        />
+        <Box mx="auto">
+          <AddLayout handleAddNode={onAddNode} selectedParent={parent} />
+          <Flex justifyContent="center">
+            <Button onClick={handleSubmit}>Generate</Button>
+          </Flex>
+        </Box>
+      </Flex>
     </div>
-  )
+  );
 }
