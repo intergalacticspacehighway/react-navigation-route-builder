@@ -5,6 +5,7 @@ const express = require("express");
 const next = require("next");
 const fs = require("fs");
 const templateRenderers = require("./templates");
+const { v4: uuidv4 } = require("uuid");
 const zip = require("express-easy-zip");
 
 const dev = process.env.NODE_ENV !== "production";
@@ -14,9 +15,8 @@ const port = parseInt(process.env.PORT, 10) || 3000;
 const bodyParser = require("body-parser");
 const tempPath = path.resolve(__dirname, "temp");
 
-let people = ["geddy", "neil", "alex"];
 const generateFileForNode = ({ id, node }) => {
-  console.log({ node });
+  // console.log({ node });
   const templateString = getTemplateString({
     type: node.type,
     children: node.children,
@@ -31,14 +31,10 @@ const generateFileForNode = ({ id, node }) => {
 };
 
 const generateTemplates = ({ data, id }) => {
-  createDirectories(id);
-
   let visitedSet = new Set();
   let queue = [];
   queue.push(data);
   visitedSet.add(data.id);
-
-  // Create templates and files for root stack
 
   while (queue.length !== 0) {
     let node = queue.shift();
@@ -50,7 +46,6 @@ const generateTemplates = ({ data, id }) => {
       if (!visitedSet.has(childNode.id)) {
         queue.push(childNode);
         visitedSet.add(childNode.id);
-        // Create templates and files childNode
       }
     }
   }
@@ -63,7 +58,9 @@ app.prepare().then(() => {
   server.use(bodyParser.json());
 
   server.post("/api/generate", async (req, res) => {
-    const sessionId = "1";
+    const sessionId = uuidv4();
+    createDirectories(sessionId);
+
     generateTemplates({ data: req.body, id: sessionId });
     const folderPath = path.resolve(tempPath, sessionId);
 
@@ -78,15 +75,15 @@ app.prepare().then(() => {
         filename: "boilerplate.zip",
       })
       .then(function (obj) {
-        var zipFileSizeInBytes = obj.size;
-        var ignoredFileArray = obj.ignored;
-        console.log("done ", zipFileSizeInBytes, ignoredFileArray);
+        const zipFileSizeInBytes = obj.size;
+        const ignoredFileArray = obj.ignored;
+        console.log("zip sent ", { zipFileSizeInBytes, ignoredFileArray });
+        deleteDirectories(sessionId);
       })
       .catch(function (err) {
-        console.log(err); //if zip failed
+        deleteDirectories(sessionId);
+        console.log(err);
       });
-    // res.status = 200;
-    // res.send();
   });
 
   server.all("*", (req, res) => {
@@ -102,9 +99,6 @@ app.prepare().then(() => {
 });
 
 const createDirectories = (id) => {
-  // Delete directories for testing
-  deleteDirectories(id);
-
   if (!fs.existsSync(tempPath)) {
     fs.mkdirSync(tempPath);
   }

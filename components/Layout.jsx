@@ -7,7 +7,7 @@ import {
   CloseButton,
 } from "@chakra-ui/react";
 
-export function Layout({ data, onSelectParent, selectedParent, onRemove }) {
+export function Layout({ data, onSelectNode, selectedNodeId, onRemove }) {
   const renderTree = (tree) => {
     return (
       <List pl={5}>
@@ -17,8 +17,8 @@ export function Layout({ data, onSelectParent, selectedParent, onRemove }) {
               <HStack spacing={2}>
                 <Button
                   variant="outline"
-                  onClick={() => onSelectParent(child.id)}
-                  bg={selectedParent === child.id ? "green.200" : "none"}
+                  onClick={() => onSelectNode(child.id)}
+                  bg={selectedNodeId === child.id ? "green.200" : "none"}
                 >
                   {child.name} ({child.label})
                 </Button>
@@ -45,7 +45,7 @@ export function Layout({ data, onSelectParent, selectedParent, onRemove }) {
           <Button
             variant="outline"
             onClick={() => onSelectParent(data.id)}
-            bg={selectedParent === data.id ? "green.200" : "none"}
+            bg={selectedNodeId === data.id ? "green.200" : "none"}
           >
             Root stack
           </Button>

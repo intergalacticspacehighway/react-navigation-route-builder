@@ -39,7 +39,7 @@ const nodes = [
   },
 ];
 
-export function AddLayout({ handleAddNode, selectedParent }) {
+export function AddLayout({ handleAddNode, selectedNode }) {
   const ref = useRef();
   const nameRef = useRef();
   const onSubmit = (e) => {
@@ -82,7 +82,7 @@ export function AddLayout({ handleAddNode, selectedParent }) {
           ></Input>
         </FormLabel>
         <Box>
-          <Button type="submit" disabled={selectedParent.type === "screen"}>
+          <Button type="submit" disabled={selectedNode.type === "screen"}>
             Add Layout
           </Button>
         </Box>

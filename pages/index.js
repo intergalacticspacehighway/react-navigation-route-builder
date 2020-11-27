@@ -5,7 +5,7 @@ import { Layout } from "../components/Layout";
 import { v4 as uuidv4 } from "uuid";
 import { Box, Button, Flex, VStack } from "@chakra-ui/react";
 
-const dummyTree = {
+const rootTree = {
   type: "stack",
   id: "root",
   name: "RootStack",
@@ -26,15 +26,15 @@ const findTreeNode = (tree, id) => {
 };
 
 export default function Home() {
-  const [treeData, setTreeData] = useState(dummyTree);
-  const [selectedParent, setSelectedParent] = useState(dummyTree.id);
-  const parent = useMemo(() => {
-    const node = findTreeNode(treeData, selectedParent);
+  const [treeData, setTreeData] = useState(rootTree);
+  const [selectedNodeId, setSelectedNodeId] = useState(rootTree.id);
+  const selectedNode = useMemo(() => {
+    const node = findTreeNode(treeData, selectedNodeId);
     return node;
-  }, [selectedParent, treeData]);
+  }, [selectedNodeId, treeData]);
 
   const onAddNode = (node) => {
-    const parent = findTreeNode(treeData, selectedParent);
+    const parent = findTreeNode(treeData, selectedNodeId);
     parent.children = parent.children.concat({
       ...node,
       children: [],
@@ -68,7 +68,7 @@ export default function Home() {
 
     parent.children = parent.children.filter((child) => child.id !== nodeId);
 
-    setSelectedParent(parent.id);
+    setSelectedNodeId(parent.id);
     setTreeData({
       ...treeData,
     });
@@ -96,13 +96,13 @@ export default function Home() {
       <Flex flexDirection="row" justify="space-between">
         <Layout
           data={treeData}
-          selectedParent={selectedParent}
+          selectedNodeId={selectedNodeId}
           onRemove={onRemove}
-          onSelectParent={setSelectedParent}
+          onSelectNode={setSelectedNodeId}
         />
         <Box ml="auto">
           <VStack spacing={4}>
-            <AddLayout handleAddNode={onAddNode} selectedParent={parent} />
+            <AddLayout handleAddNode={onAddNode} selectedNode={selectedNode} />
             <Button onClick={handleSubmit}>Generate</Button>
           </VStack>
         </Box>
