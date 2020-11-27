@@ -12,7 +12,7 @@ export function Layout({ data, onSelectParent, selectedParent }) {
                 onClick={() => onSelectParent(child.id)}
                 bg={selectedParent === child.id ? "green.200" : "none"}
               >
-                {child.label}
+                {child.name} ({child.label})
               </Button>
               {child.children.length > 0 ? renderTree(child) : null}
             </ListItem>

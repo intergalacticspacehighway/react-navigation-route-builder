@@ -3,11 +3,12 @@ import { useMemo, useState } from "react";
 import { AddLayout } from "../components/AddLayout";
 import { Layout } from "../components/Layout";
 import { v4 as uuidv4 } from "uuid";
-import { Box, Button, Flex } from "@chakra-ui/react";
+import { Box, Button, Flex, VStack } from "@chakra-ui/react";
 
 const dummyTree = {
-  type: "root",
+  type: "stack",
   id: "root",
+  name: "RootStack",
   children: [],
 };
 
@@ -68,11 +69,11 @@ export default function Home() {
           selectedParent={selectedParent}
           onSelectParent={(parent) => setSelectedParent(parent)}
         />
-        <Box mx="auto">
-          <AddLayout handleAddNode={onAddNode} selectedParent={parent} />
-          <Flex justifyContent="center">
+        <Box ml="auto">
+          <VStack spacing={4}>
+            <AddLayout handleAddNode={onAddNode} selectedParent={parent} />
             <Button onClick={handleSubmit}>Generate</Button>
-          </Flex>
+          </VStack>
         </Box>
       </Flex>
     </div>
