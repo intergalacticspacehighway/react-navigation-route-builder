@@ -1,7 +1,7 @@
 
     import React from "react";
   
-    export function Screen1() {
+    export function TweetsAndReplies() {
       return (
         <></>
       );

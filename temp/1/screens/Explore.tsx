@@ -1,7 +1,7 @@
 
     import React from "react";
   
-    export function OpenAlert() {
+    export function Explore() {
       return (
         <></>
       );

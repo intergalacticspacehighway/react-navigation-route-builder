@@ -1,19 +1,30 @@
-import { Box, Button, List, ListItem } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  HStack,
+  List,
+  ListItem,
+  CloseButton,
+} from "@chakra-ui/react";
 
-export function Layout({ data, onSelectParent, selectedParent }) {
+export function Layout({ data, onSelectParent, selectedParent, onRemove }) {
   const renderTree = (tree) => {
     return (
       <List pl={5}>
         {tree.children.map((child, index) => {
           return (
             <ListItem key={child.id} pl={1} pt={1}>
-              <Button
-                variant="outline"
-                onClick={() => onSelectParent(child.id)}
-                bg={selectedParent === child.id ? "green.200" : "none"}
-              >
-                {child.name} ({child.label})
-              </Button>
+              <HStack spacing={2}>
+                <Button
+                  variant="outline"
+                  onClick={() => onSelectParent(child.id)}
+                  bg={selectedParent === child.id ? "green.200" : "none"}
+                >
+                  {child.name} ({child.label})
+                </Button>
+
+                <CloseButton onClick={() => onRemove(child.id)}></CloseButton>
+              </HStack>
               {child.children.length > 0 ? renderTree(child) : null}
             </ListItem>
           );

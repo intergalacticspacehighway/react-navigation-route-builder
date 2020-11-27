@@ -1,7 +1,7 @@
 
     import React from "react";
   
-    export function Screen2() {
+    export function Messages() {
       return (
         <></>
       );

@@ -5,6 +5,7 @@ const express = require("express");
 const next = require("next");
 const fs = require("fs");
 const templateRenderers = require("./templates");
+const zip = require("express-easy-zip");
 
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
@@ -57,13 +58,35 @@ const generateTemplates = ({ data, id }) => {
 
 app.prepare().then(() => {
   const server = express();
+  server.use(zip());
+
   server.use(bodyParser.json());
 
-  server.post("/api/generate", (req, res) => {
+  server.post("/api/generate", async (req, res) => {
     const sessionId = "1";
     generateTemplates({ data: req.body, id: sessionId });
-    res.status = 200;
-    res.send();
+    const folderPath = path.resolve(tempPath, sessionId);
+
+    res
+      .zip({
+        files: [
+          {
+            path: folderPath,
+            name: "boilerplate",
+          },
+        ],
+        filename: "boilerplate.zip",
+      })
+      .then(function (obj) {
+        var zipFileSizeInBytes = obj.size;
+        var ignoredFileArray = obj.ignored;
+        console.log("done ", zipFileSizeInBytes, ignoredFileArray);
+      })
+      .catch(function (err) {
+        console.log(err); //if zip failed
+      });
+    // res.status = 200;
+    // res.send();
   });
 
   server.all("*", (req, res) => {

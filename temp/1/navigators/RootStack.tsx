@@ -2,8 +2,8 @@
     import React from "react";
     import { createStackNavigator } from '@react-navigation/stack';
     
-  import { Screen1, Screen2 } from "../screens";  
-  import {DashboardStack} from "./DashboardStack"
+  import { Notifications, Messages, Explore, Bookmarks } from "../screens";  
+  import {Profile} from "./Profile"
   
     
     const Stack = createStackNavigator();
@@ -11,9 +11,11 @@
     export function RootStack() {
       return (
         <Stack.Navigator>
-        <Stack.Screen name="Screen1" component={Screen1} />
-<Stack.Screen name="Screen2" component={Screen2} />
-<Stack.Screen name="DashboardStack" component={DashboardStack} />
+        <Stack.Screen name="Profile" component={Profile} />
+<Stack.Screen name="Notifications" component={Notifications} />
+<Stack.Screen name="Messages" component={Messages} />
+<Stack.Screen name="Explore" component={Explore} />
+<Stack.Screen name="Bookmarks" component={Bookmarks} />
           
         </Stack.Navigator>
       );

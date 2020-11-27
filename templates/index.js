@@ -39,7 +39,7 @@ const stack = ({ children, name }) => {
     `;
 };
 
-const drawer = ({ children }) => {
+const drawer = ({ children, name }) => {
   return `
     ${commonImports};
     import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -62,7 +62,7 @@ const drawer = ({ children }) => {
     `;
 };
 
-const materialTopTab = ({ children }) => {
+const materialTopTab = ({ children, name }) => {
   return `
     ${commonImports};
     import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
@@ -86,7 +86,7 @@ const materialTopTab = ({ children }) => {
     `;
 };
 
-const materialBottomTab = ({ children }) => {
+const materialBottomTab = ({ children, name }) => {
   return `
     ${commonImports};
     import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
@@ -110,7 +110,7 @@ const materialBottomTab = ({ children }) => {
     `;
 };
 
-const bottomTab = ({ children }) => {
+const bottomTab = ({ children, name }) => {
   return `
     ${commonImports};
     import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
