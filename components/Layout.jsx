@@ -44,7 +44,7 @@ export function Layout({ data, onSelectNode, selectedNodeId, onRemove }) {
         <ListItem pl={1} pt={1}>
           <Button
             variant="outline"
-            onClick={() => onSelectParent(data.id)}
+            onClick={() => onSelectNode(data.id)}
             bg={selectedNodeId === data.id ? "green.200" : "none"}
           >
             Root stack
