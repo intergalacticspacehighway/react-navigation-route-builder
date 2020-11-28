@@ -42,12 +42,20 @@ const nodes = [
 export function AddLayout({ handleAddNode, selectedNode }) {
   const ref = useRef();
   const nameRef = useRef();
+  const routeRef = useRef();
+
   const onSubmit = (e) => {
     e.preventDefault();
-    handleAddNode({
+    let data = {
       ...nodes[ref.current.value],
       name: nameRef.current.value,
-    });
+    };
+
+    if (routeRef.current.value) {
+      data.route = routeRef.current.value;
+    }
+
+    handleAddNode(data);
   };
 
   return (
@@ -81,6 +89,18 @@ export function AddLayout({ handleAddNode, selectedNode }) {
             placeholder="Enter name of the layout/screen"
           ></Input>
         </FormLabel>
+
+        {selectedNode.type === "screen" ? (
+          <FormLabel w="100%">
+            Enter route
+            <Input
+              ref={nameRef}
+              required
+              type="text"
+              placeholder="Enter route for the screen"
+            ></Input>
+          </FormLabel>
+        ) : null}
         <Box>
           <Button type="submit" disabled={selectedNode.type === "screen"}>
             Add Layout
