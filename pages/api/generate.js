@@ -1,10 +1,39 @@
-// server.js
 const path = require("path");
 const fs = require("fs");
 const templateRenderers = require("../../templates");
 const { v4: uuidv4 } = require("uuid");
 const archiver = require("archiver");
 const tempPath = path.resolve(__dirname, "tmp");
+
+export default async function handler(req, res) {
+  const sessionId = uuidv4();
+  const folderPath = path.resolve(tempPath, sessionId);
+  try {
+    createDirectories(sessionId);
+    generateTemplates({ data: req.body, id: sessionId });
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "application/zip");
+    await zipDirectory(folderPath, res);
+  } catch (e) {
+    console.error(e);
+    res.statusCode = 500;
+    res.end(JSON.stringify({ message: "Something went wrong" }));
+  } finally {
+    console.log("cleaning up folders");
+    deleteFolderRecursive(folderPath);
+  }
+}
+
+function zipDirectory(source, res) {
+  const archive = archiver("zip", { zlib: { level: 9 } });
+
+  return new Promise((resolve, reject) => {
+    archive.directory(source, false).on("error", reject).pipe(res);
+
+    res.on("close", resolve);
+    archive.finalize();
+  });
+}
 
 const generateFileForNode = ({ id, node }) => {
   // console.log({ node });
@@ -102,37 +131,3 @@ const createFile = ({ id, templateString, type, name }) => {
   // console.log({ templateString });
   fs.writeFileSync(filePath, templateString);
 };
-
-export default async function handler(req, res) {
-  try {
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "application/json");
-
-    const sessionId = uuidv4();
-    createDirectories(sessionId);
-
-    generateTemplates({ data: req.body, id: sessionId });
-    const folderPath = path.resolve(tempPath, sessionId);
-
-    const outputPath = path.resolve(folderPath, "boilerplate.zip");
-    await zipDirectory(folderPath, outputPath);
-    const readStream = fs.createReadStream(outputPath);
-    readStream.pipe(res);
-  } catch (e) {
-    console.error(e);
-    res.statusCode = 500;
-    res.end(JSON.stringify({ message: "Something went wrong" }));
-  }
-}
-
-function zipDirectory(source, out) {
-  const archive = archiver("zip", { zlib: { level: 9 } });
-  const stream = fs.createWriteStream(out);
-
-  return new Promise((resolve, reject) => {
-    archive.directory(source, false).on("error", reject).pipe(stream);
-
-    stream.on("close", resolve);
-    archive.finalize();
-  });
-}
