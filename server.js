@@ -3,7 +3,7 @@ const { parse } = require("url");
 const path = require("path");
 const express = require("express");
 const next = require("next");
-const { fs } = require("memfs");
+const fs = require("fs");
 const templateRenderers = require("./templates");
 const { v4: uuidv4 } = require("uuid");
 const zip = require("express-easy-zip");
@@ -13,8 +13,7 @@ const app = next({ dev });
 const handle = app.getRequestHandler();
 const port = parseInt(process.env.PORT, 10) || 3000;
 const bodyParser = require("body-parser");
-const { cursorTo } = require("readline");
-const tempPath = "/temp";
+const tempPath = "/tmp";
 
 const generateFileForNode = ({ id, node }) => {
   // console.log({ node });
@@ -64,22 +63,13 @@ app.prepare().then(() => {
 
     generateTemplates({ data: req.body, id: sessionId });
     const folderPath = path.resolve(tempPath, sessionId);
-    // const directories = fs.readdirSync(tempPath);
-    const filePath = getAFileFromFolder(folderPath);
-    console.log({ filePath });
-    const fileContent = fs.readFileSync(`/temp/${sessionId}/screens/A.tsx`, {
-      encoding: "utf-8",
-    });
+
     res
       .zip({
         files: [
           {
-            content: fileContent,
-            name: "file-name.tsx",
-            mode: 0755,
-            comment: "comment-for-the-file",
-            date: new Date(),
-            type: "file",
+            path: folderPath,
+            name: "boilerplate",
           },
         ],
         filename: "boilerplate.zip",
@@ -143,23 +133,6 @@ const deleteFolderRecursive = function (path) {
       }
     });
     fs.rmdirSync(path);
-  }
-};
-
-const getAFileFromFolder = function (path) {
-  if (fs.existsSync(path)) {
-    fs.readdirSync(path).forEach(function (file, index) {
-      const curPath = path + "/" + file;
-      console.log("file ", file);
-      if (fs.lstatSync(curPath).isDirectory()) {
-        // recurse
-        const file = getAFileFromFolder(curPath);
-        return file;
-      } else {
-        // delete file
-        return curPath;
-      }
-    });
   }
 };
 
