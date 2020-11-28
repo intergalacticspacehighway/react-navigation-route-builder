@@ -1,19 +1,10 @@
 // server.js
-const { parse } = require("url");
 const path = require("path");
-const express = require("express");
-const next = require("next");
 const fs = require("fs");
-const templateRenderers = require("./templates");
+const templateRenderers = require("../../templates");
 const { v4: uuidv4 } = require("uuid");
-const zip = require("express-easy-zip");
 
-const dev = process.env.NODE_ENV !== "production";
-const app = next({ dev });
-const handle = app.getRequestHandler();
-const port = parseInt(process.env.PORT, 10) || 3000;
-const bodyParser = require("body-parser");
-const tempPath = "/tmp";
+const tempPath = path.resolve(__dirname, "tmp");
 
 const generateFileForNode = ({ id, node }) => {
   // console.log({ node });
@@ -50,53 +41,6 @@ const generateTemplates = ({ data, id }) => {
     }
   }
 };
-
-app.prepare().then(() => {
-  const server = express();
-  server.use(zip());
-
-  server.use(bodyParser.json());
-
-  server.post("/api/generate", async (req, res) => {
-    const sessionId = uuidv4();
-    createDirectories(sessionId);
-
-    generateTemplates({ data: req.body, id: sessionId });
-    const folderPath = path.resolve(tempPath, sessionId);
-
-    res
-      .zip({
-        files: [
-          {
-            path: folderPath,
-            name: "boilerplate",
-          },
-        ],
-        filename: "boilerplate.zip",
-      })
-      .then(function (obj) {
-        const zipFileSizeInBytes = obj.size;
-        const ignoredFileArray = obj.ignored;
-        console.log("zip sent ", { zipFileSizeInBytes, ignoredFileArray });
-        deleteDirectories(sessionId);
-      })
-      .catch(function (err) {
-        deleteDirectories(sessionId);
-        console.log(err);
-      });
-  });
-
-  server.all("*", (req, res) => {
-    const parsedUrl = parse(req.url, true);
-
-    return handle(req, res, parsedUrl);
-  });
-
-  server.listen(port, (err) => {
-    if (err) throw err;
-    console.log(`> Ready on http://localhost:${port}`);
-  });
-});
 
 const createDirectories = (id) => {
   if (!fs.existsSync(tempPath)) {
@@ -158,3 +102,39 @@ const createFile = ({ id, templateString, type, name }) => {
   // console.log({ templateString });
   fs.writeFileSync(filePath, templateString);
 };
+
+export default function handler(req, res) {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/json");
+
+  const sessionId = uuidv4();
+  createDirectories(sessionId);
+
+  generateTemplates({ data: req.body, id: sessionId });
+  const folderPath = path.resolve(tempPath, sessionId);
+  const files = fs.readdirSync(tempPath);
+  console.log("mann ", files);
+
+  //   res
+  //     .zip({
+  //       files: [
+  //         {
+  //           path: folderPath,
+  //           name: "boilerplate",
+  //         },
+  //       ],
+  //       filename: "boilerplate.zip",
+  //     })
+  //     .then(function (obj) {
+  //       const zipFileSizeInBytes = obj.size;
+  //       const ignoredFileArray = obj.ignored;
+  //       console.log("zip sent ", { zipFileSizeInBytes, ignoredFileArray });
+  //       deleteDirectories(sessionId);
+  //     })
+  //     .catch(function (err) {
+  //       deleteDirectories(sessionId);
+  //       console.log(err);
+  //     });
+
+  res.end(JSON.stringify({ name: "John Doe" }));
+}
