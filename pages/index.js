@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AddLayout } from "../components/AddLayout";
 import { Layout } from "../components/Layout";
 import { v4 as uuidv4 } from "uuid";
@@ -88,6 +88,13 @@ export default function Home() {
     console.log({ res });
   };
 
+  const iframeRef = useRef(null);
+
+  useEffect(() => {
+    iframeRef.current.contentWindow.postMessage(JSON.stringify(treeData));
+    console.log({ iframe: iframeRef.current.contentWindow });
+  }, [treeData]);
+
   return (
     <div>
       <Head>
@@ -107,6 +114,12 @@ export default function Home() {
           </VStack>
         </Box>
       </Flex>
+      <iframe
+        ref={iframeRef}
+        src="https://priceless-bardeen-635754.netlify.app"
+        height={600}
+        width={400}
+      ></iframe>
     </div>
   );
 }
