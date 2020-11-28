@@ -51,7 +51,7 @@ export function AddLayout({ handleAddNode, selectedNode }) {
       name: nameRef.current.value,
     };
 
-    if (routeRef.current.value) {
+    if (routeRef.current && routeRef.current.value) {
       data.route = routeRef.current.value;
     }
 
