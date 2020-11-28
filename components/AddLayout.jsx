@@ -10,7 +10,7 @@ import {
   AlertTitle,
   Link,
 } from "@chakra-ui/react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 const nodes = [
   {
@@ -40,14 +40,14 @@ const nodes = [
 ];
 
 export function AddLayout({ handleAddNode, selectedNode }) {
-  const ref = useRef();
+  const [selected, setSelected] = useState("screen");
   const nameRef = useRef();
   const routeRef = useRef();
 
   const onSubmit = (e) => {
     e.preventDefault();
     let data = {
-      ...nodes[ref.current.value],
+      ...nodes.find((item) => item.type === selected),
       name: nameRef.current.value,
     };
 
@@ -69,10 +69,14 @@ export function AddLayout({ handleAddNode, selectedNode }) {
       >
         <FormLabel w="100%">
           Select layout/screen
-          <Select ref={ref} required>
-            {nodes.map((node, index) => {
+          <Select
+            required
+            onChange={(e) => setSelected(e.target.value)}
+            selected={selected}
+          >
+            {nodes.map((node) => {
               return (
-                <option key={node.type} value={index}>
+                <option key={node.type} value={node.type}>
                   {node.label}
                 </option>
               );
@@ -90,17 +94,17 @@ export function AddLayout({ handleAddNode, selectedNode }) {
           ></Input>
         </FormLabel>
 
-        {selectedNode.type === "screen" ? (
+        {selected === "screen" && (
           <FormLabel w="100%">
             Enter route
             <Input
-              ref={nameRef}
+              ref={routeRef}
               required
               type="text"
               placeholder="Enter route for the screen"
             ></Input>
           </FormLabel>
-        ) : null}
+        )}
         <Box>
           <Button type="submit" disabled={selectedNode.type === "screen"}>
             Add Layout
