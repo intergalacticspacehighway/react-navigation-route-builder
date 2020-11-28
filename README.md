@@ -6,6 +6,8 @@
 
 [Try it out](https://rnrb.vercel.app/)
 
-</div>
+<br/>
 
 ![](demo.gif)
+
+</div>
