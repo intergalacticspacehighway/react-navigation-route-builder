@@ -1,7 +1,0 @@
-{
-    "functions": {
-      "api/generate": {
-        "includeFiles": "temp/**"
-      }
-    }
-  }
