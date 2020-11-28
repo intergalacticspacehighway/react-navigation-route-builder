@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AddLayout } from "../components/AddLayout";
 import { Layout } from "../components/Layout";
 import { v4 as uuidv4 } from "uuid";
-import { Box, Button, Flex, VStack } from "@chakra-ui/react";
+import { Box, Button, Flex, FormLabel, Input, VStack } from "@chakra-ui/react";
 
 const rootTree = {
   type: "stack",
@@ -26,6 +26,9 @@ const findTreeNode = (tree, id) => {
 };
 
 export default function Home() {
+  const [iframeUrl, setIframeUrl] = useState(
+    "https://priceless-bardeen-635754.netlify.app"
+  );
   const [treeData, setTreeData] = useState(rootTree);
   const [selectedNodeId, setSelectedNodeId] = useState(rootTree.id);
   const selectedNode = useMemo(() => {
@@ -114,12 +117,15 @@ export default function Home() {
           </VStack>
         </Box>
       </Flex>
-      <iframe
-        ref={iframeRef}
-        src="https://priceless-bardeen-635754.netlify.app"
-        height={600}
-        width={400}
-      ></iframe>
+      <FormLabel w="100%">
+        Iframe url
+        <Input
+          type="text"
+          value={iframeUrl}
+          onChange={(e) => setIframeUrl(e.target.value)}
+        ></Input>
+      </FormLabel>
+      <iframe ref={iframeRef} src={iframeUrl} height={600} width={400}></iframe>
     </div>
   );
 }
