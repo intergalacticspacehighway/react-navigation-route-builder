@@ -15,6 +15,7 @@
     "express": "^4.17.1",
     "express-easy-zip": "^1.1.5",
     "framer-motion": "^2.9.4",
+    "memfs": "^3.2.0",
     "next": "10.0.2",
     "nodemon": "^2.0.6",
     "react": "^16.8",
