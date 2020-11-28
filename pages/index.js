@@ -94,7 +94,7 @@ export default function Home() {
   const iframeRef = useRef(null);
 
   useEffect(() => {
-    iframeRef.current.contentWindow.postMessage(JSON.stringify(treeData));
+    iframeRef.current.contentWindow.postMessage(JSON.stringify(treeData), "*");
     console.log({ iframe: iframeRef.current.contentWindow });
   }, [treeData]);
 
