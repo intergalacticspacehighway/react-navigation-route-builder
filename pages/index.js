@@ -91,7 +91,7 @@ export default function Home() {
   return (
     <div>
       <Head>
-        <title>RN boilerplate generator</title>
+        <title>RN route builder</title>
       </Head>
       <Flex flexDirection="row" justify="space-between">
         <Layout

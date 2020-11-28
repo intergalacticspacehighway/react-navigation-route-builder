@@ -5,27 +5,27 @@ const dynamicImports = (children) => {
   const navigatorChildren = children.filter((child) => child.type !== "screen");
 
   return `
-  import { ${screenChildren
+import { ${screenChildren
     .map((child) => child.name)
     .join(", ")} } from "../screens";  
-  ${navigatorChildren
-    .map((child) => {
-      return `import {${child.name}} from "./${child.name}"`;
-    })
-    .join("\n")}
-  `;
+${navigatorChildren
+  .map((child) => {
+    return `import {${child.name}} from "./${child.name}"`;
+  })
+  .join("\n")}
+`;
 };
 
 const stack = ({ children, name }) => {
   return `
-    ${commonImports};
+${commonImports};
     import { createStackNavigator } from '@react-navigation/stack';
-    ${dynamicImports(children)}
+${dynamicImports(children)}
     
-    const Stack = createStackNavigator();
+const Stack = createStackNavigator();
     
-    export function ${name}() {
-      return (
+export function ${name}() {
+    return (
         <Stack.Navigator>
         ${children
           .map((child) => {
@@ -34,21 +34,21 @@ const stack = ({ children, name }) => {
           .join("\n")}
           
         </Stack.Navigator>
-      );
-    }    
-    `;
+    );
+}    
+`;
 };
 
 const drawer = ({ children, name }) => {
   return `
-    ${commonImports};
-    import { createDrawerNavigator } from '@react-navigation/drawer';
-    ${dynamicImports(children)}
+${commonImports};
+import { createDrawerNavigator } from '@react-navigation/drawer';
+${dynamicImports(children)}
+
+const Drawer = createDrawerNavigator();
     
-    const Drawer = createDrawerNavigator();
-    
-    export function ${name}() {
-      return (
+export function ${name}() {
+    return (
         <Drawer.Navigator>
         ${children
           .map((child) => {
@@ -58,21 +58,21 @@ const drawer = ({ children, name }) => {
           
         </Drawer.Navigator>
       );
-    }    
-    `;
+}    
+`;
 };
 
 const materialTopTab = ({ children, name }) => {
   return `
-    ${commonImports};
-    import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+${commonImports};
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
-    ${dynamicImports(children)}
+${dynamicImports(children)}
  
-    const Tab = createMaterialTopTabNavigator();
+const Tab = createMaterialTopTabNavigator();
     
-    export function ${name}() {
-      return (
+export function ${name}() {
+    return (
         <Tab.Navigator>
         ${children
           .map((child) => {
@@ -82,20 +82,20 @@ const materialTopTab = ({ children, name }) => {
           
         </Tab.Navigator>
       );
-    }    
-    `;
+}    
+`;
 };
 
 const materialBottomTab = ({ children, name }) => {
   return `
-    ${commonImports};
-    import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+${commonImports};
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 
-    ${dynamicImports(children)}
- 
-    const Tab = createMaterialBottomTabNavigator();
-    
-    export function ${name}() {
+${dynamicImports(children)}
+
+const Tab = createMaterialBottomTabNavigator();
+
+export function ${name}() {
       return (
         <Tab.Navigator>
         ${children
@@ -105,22 +105,22 @@ const materialBottomTab = ({ children, name }) => {
           .join("\n")}
           
         </Tab.Navigator>
-      );
-    }    
-    `;
+    );
+}    
+`;
 };
 
 const bottomTab = ({ children, name }) => {
   return `
-    ${commonImports};
-    import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+${commonImports};
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-    ${dynamicImports(children)}
- 
-    const Tab = createBottomTabNavigator();
+${dynamicImports(children)}
+
+const Tab = createBottomTabNavigator();
     
-    export function ${name}() {
-      return (
+export function ${name}() {
+    return (
         <Tab.Navigator>
         ${children
           .map((child) => {
@@ -129,21 +129,21 @@ const bottomTab = ({ children, name }) => {
           .join("\n")}
           
         </Tab.Navigator>
-      );
-    }    
-    `;
+    );
+}    
+`;
 };
 
 const screen = ({ name }) => {
   return `
-    ${commonImports};
+${commonImports};
   
-    export function ${name}() {
+export function ${name}() {
       return (
         <></>
-      );
-    }    
-    `;
+  );
+}    
+`;
 };
 
 module.exports = {
