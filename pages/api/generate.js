@@ -3,7 +3,7 @@ const path = require("path");
 const fs = require("fs");
 const templateRenderers = require("../../templates");
 const { v4: uuidv4 } = require("uuid");
-
+const archiver = require("archiver");
 const tempPath = path.resolve(__dirname, "tmp");
 
 const generateFileForNode = ({ id, node }) => {
@@ -103,38 +103,36 @@ const createFile = ({ id, templateString, type, name }) => {
   fs.writeFileSync(filePath, templateString);
 };
 
-export default function handler(req, res) {
-  res.statusCode = 200;
-  res.setHeader("Content-Type", "application/json");
+export default async function handler(req, res) {
+  try {
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "application/json");
 
-  const sessionId = uuidv4();
-  createDirectories(sessionId);
+    const sessionId = uuidv4();
+    createDirectories(sessionId);
 
-  generateTemplates({ data: req.body, id: sessionId });
-  const folderPath = path.resolve(tempPath, sessionId);
-  const files = fs.readdirSync(tempPath);
-  console.log("mann ", files);
+    generateTemplates({ data: req.body, id: sessionId });
+    const folderPath = path.resolve(tempPath, sessionId);
 
-  //   res
-  //     .zip({
-  //       files: [
-  //         {
-  //           path: folderPath,
-  //           name: "boilerplate",
-  //         },
-  //       ],
-  //       filename: "boilerplate.zip",
-  //     })
-  //     .then(function (obj) {
-  //       const zipFileSizeInBytes = obj.size;
-  //       const ignoredFileArray = obj.ignored;
-  //       console.log("zip sent ", { zipFileSizeInBytes, ignoredFileArray });
-  //       deleteDirectories(sessionId);
-  //     })
-  //     .catch(function (err) {
-  //       deleteDirectories(sessionId);
-  //       console.log(err);
-  //     });
+    const outputPath = path.resolve(folderPath, "boilerplate.zip");
+    await zipDirectory(folderPath, outputPath);
+    const readStream = fs.createReadStream(outputPath);
+    readStream.pipe(res);
+  } catch (e) {
+    console.error(e);
+    res.statusCode = 500;
+    res.end(JSON.stringify({ message: "Something went wrong" }));
+  }
+}
 
-  res.end(JSON.stringify({ name: "John Doe" }));
+function zipDirectory(source, out) {
+  const archive = archiver("zip", { zlib: { level: 9 } });
+  const stream = fs.createWriteStream(out);
+
+  return new Promise((resolve, reject) => {
+    archive.directory(source, false).on("error", reject).pipe(stream);
+
+    stream.on("close", resolve);
+    archive.finalize();
+  });
 }

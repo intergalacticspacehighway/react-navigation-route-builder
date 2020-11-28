@@ -11,6 +11,7 @@
     "@chakra-ui/react": "^1.0.1",
     "@emotion/react": "^11.1.1",
     "@emotion/styled": "^11.0.0",
+    "archiver": "^5.1.0",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "express-easy-zip": "^1.1.5",
