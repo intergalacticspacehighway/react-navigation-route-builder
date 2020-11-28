@@ -13,7 +13,7 @@ const app = next({ dev });
 const handle = app.getRequestHandler();
 const port = parseInt(process.env.PORT, 10) || 3000;
 const bodyParser = require("body-parser");
-const tempPath = path.resolve(__dirname, "temp");
+const tempPath = path.resolve(__dirname, "public");
 
 const generateFileForNode = ({ id, node }) => {
   // console.log({ node });
@@ -146,9 +146,9 @@ const getTemplateString = ({ children, type, name }) => {
 };
 
 const createFile = ({ id, templateString, type, name }) => {
-  let folderPath = path.resolve(__dirname, "temp", id, "navigators");
+  let folderPath = path.resolve(tempPath, id, "navigators");
   if (type === "screen") {
-    folderPath = path.resolve(__dirname, "temp", id, "screens");
+    folderPath = path.resolve(tempPath, id, "screens");
     const exportsString = `export * from "./${name}"\n`;
     const indexFilePath = path.resolve(folderPath, `index.tsx`);
     fs.appendFileSync(indexFilePath, exportsString);
