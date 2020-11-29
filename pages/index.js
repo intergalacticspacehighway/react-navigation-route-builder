@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { AddLayout } from "../components/AddLayout";
 import { Layout } from "../components/Layout";
 import { v4 as uuidv4 } from "uuid";
-import { Box, Button, Flex, VStack } from "@chakra-ui/react";
+import { Box, Button, Flex, VStack, Link } from "@chakra-ui/react";
 
 const rootTree = {
   type: "stack",
@@ -104,6 +104,12 @@ export default function Home() {
           <VStack spacing={4}>
             <AddLayout handleAddNode={onAddNode} selectedNode={selectedNode} />
             <Button onClick={handleSubmit}>Generate</Button>
+            <Link
+              href="https://github.com/intergalacticspacehighway/react-navigation-route-builder"
+              isExternal
+            >
+              Github
+            </Link>
           </VStack>
         </Box>
       </Flex>
