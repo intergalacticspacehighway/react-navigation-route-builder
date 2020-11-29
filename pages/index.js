@@ -108,7 +108,7 @@ export default function Home() {
               href="https://github.com/intergalacticspacehighway/react-navigation-route-builder"
               isExternal
             >
-              Github
+              GitHub
             </Link>
           </VStack>
         </Box>
