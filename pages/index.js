@@ -26,9 +26,8 @@ const findTreeNode = (tree, id) => {
 };
 
 export default function Home() {
-  const [iframeUrl, setIframeUrl] = useState(
-    "https://priceless-bardeen-635754.netlify.app"
-  );
+  const iframeOrigin = "http://localhost:19006";
+  const [iframeUrl, setIframeUrl] = useState(iframeOrigin);
   const [treeData, setTreeData] = useState(rootTree);
   const [selectedNodeId, setSelectedNodeId] = useState(rootTree.id);
   const selectedNode = useMemo(() => {
@@ -94,9 +93,35 @@ export default function Home() {
   const iframeRef = useRef(null);
 
   useEffect(() => {
-    iframeRef.current.contentWindow.postMessage(JSON.stringify(treeData), "*");
-    console.log({ iframe: iframeRef.current.contentWindow });
+    // iframeRef.current.contentWindow.postMessage(
+    //   JSON.stringify({ command: "tree_update", data: treeData }),
+    //   "*"
+    // );
+
+    window.onmessage = (e) => {
+      console.log(e.data);
+      if (e.data === "rnrb_listener_attached") {
+        iframeRef.current.contentWindow.postMessage(
+          JSON.stringify({ command: "tree_update", data: treeData }),
+          "*"
+        );
+      }
+    };
   }, [treeData]);
+
+  useEffect(() => {
+    if (selectedNode.type === "screen") {
+      setIframeUrl(iframeOrigin + "/" + selectedNode.route);
+      // iframeRef.current.contentWindow.postMessage(
+      //   JSON.stringify({ command: "navigate", data: "a" }),
+      //   "*"
+      // );
+    }
+  }, [selectedNode]);
+
+  useEffect(() => {
+    iframeRef.current.contentWindow.postMessage(JSON.stringify(treeData), "*");
+  }, []);
 
   return (
     <div>
@@ -110,7 +135,14 @@ export default function Home() {
           onRemove={onRemove}
           onSelectNode={setSelectedNodeId}
         />
-        <Box ml="auto">
+        <iframe
+          ref={iframeRef}
+          src={iframeUrl}
+          height={600}
+          width={400}
+        ></iframe>
+
+        <Box>
           <VStack spacing={4}>
             <AddLayout handleAddNode={onAddNode} selectedNode={selectedNode} />
             <Button onClick={handleSubmit}>Generate</Button>
@@ -125,7 +157,6 @@ export default function Home() {
           onChange={(e) => setIframeUrl(e.target.value)}
         ></Input>
       </FormLabel>
-      <iframe ref={iframeRef} src={iframeUrl} height={600} width={400}></iframe>
     </div>
   );
 }
