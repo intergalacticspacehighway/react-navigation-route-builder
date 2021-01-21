@@ -1,15 +1,30 @@
 import Head from "next/head";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AddLayout } from "../components/AddLayout";
 import { Layout } from "../components/Layout";
 import { v4 as uuidv4 } from "uuid";
 import { Box, Button, Flex, VStack, Link } from "@chakra-ui/react";
+
+const persistKey = "persisterState";
 
 const rootTree = {
   type: "stack",
   id: "root",
   name: "RootStack",
   children: [],
+};
+
+const getPersisterStateOrDefaultState = () => {
+  let state = rootTree;
+  try {
+    if (localStorage.getItem(persistKey)) {
+      state = JSON.parse(localStorage.getItem(persistKey));
+    }
+  } catch (e) {
+    state = rootTree;
+  }
+
+  return state;
 };
 
 const findTreeNode = (tree, id) => {
@@ -26,15 +41,20 @@ const findTreeNode = (tree, id) => {
 };
 
 export default function Home() {
-  const [treeData, setTreeData] = useState(rootTree);
+  const [treeData, setTreeData] = useState(getPersisterStateOrDefaultState);
   const [selectedNodeId, setSelectedNodeId] = useState(rootTree.id);
   const selectedNode = useMemo(() => {
     const node = findTreeNode(treeData, selectedNodeId);
     return node;
   }, [selectedNodeId, treeData]);
 
+  useEffect(() => {
+    localStorage.setItem(persistKey, JSON.stringify(treeData));
+  }, [treeData]);
+
   const onAddNode = (node) => {
     const parent = findTreeNode(treeData, selectedNodeId);
+    // mutation, but okay since we're changing the reference of treeState anyways
     parent.children = parent.children.concat({
       ...node,
       children: [],
@@ -66,6 +86,7 @@ export default function Home() {
 
     console.log({ nodeId, parent });
 
+    // mutation, but okay since we're changing the reference of treeState anyways
     parent.children = parent.children.filter((child) => child.id !== nodeId);
 
     setSelectedNodeId(parent.id);
