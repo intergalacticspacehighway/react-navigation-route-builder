@@ -39,23 +39,46 @@ const nodes = [
   },
 ];
 
-export function AddLayout({ handleAddNode, selectedNode }) {
+const initialState = {
+  name: "",
+  route: "",
+};
+
+export function AddLayout({ handleAddNode, selectedNode, handleEditNode }) {
   const [selected, setSelected] = useState("screen");
-  const nameRef = useRef();
-  const routeRef = useRef();
+  const [formState, setFormState] = useState(initialState);
+
+  const isEditingScreen = selectedNode.id && selectedNode.type === selected;
+
+  React.useEffect(() => {
+    if (isEditingScreen) {
+      setFormState({
+        name: selectedNode.name,
+        route: selectedNode.route,
+        id: selectedNode.id,
+      });
+    } else {
+      setFormState(initialState);
+    }
+  }, [selectedNode, isEditingScreen]);
 
   const onSubmit = (e) => {
     e.preventDefault();
     let data = {
       ...nodes.find((item) => item.type === selected),
-      name: nameRef.current.value,
+      ...formState,
     };
 
-    if (routeRef.current && routeRef.current.value) {
-      data.route = routeRef.current.value;
+    if (isEditingScreen) {
+      console.log({ selectedNode, data });
+      data = {
+        ...selectedNode,
+        ...data,
+      };
+      handleEditNode(data);
+    } else {
+      handleAddNode(data);
     }
-
-    handleAddNode(data);
   };
 
   return (
@@ -87,7 +110,10 @@ export function AddLayout({ handleAddNode, selectedNode }) {
         <FormLabel w="100%">
           Enter name
           <Input
-            ref={nameRef}
+            value={formState.name}
+            onChange={(e) =>
+              setFormState({ ...formState, name: e.target.value })
+            }
             required
             type="text"
             placeholder="Enter name of the layout/screen"
@@ -98,7 +124,10 @@ export function AddLayout({ handleAddNode, selectedNode }) {
           <FormLabel w="100%">
             Enter route
             <Input
-              ref={routeRef}
+              value={formState.route}
+              onChange={(e) =>
+                setFormState({ ...formState, route: e.target.value })
+              }
               required
               type="text"
               placeholder="Enter route for the screen"
@@ -106,9 +135,7 @@ export function AddLayout({ handleAddNode, selectedNode }) {
           </FormLabel>
         )}
         <Box>
-          <Button type="submit" disabled={selectedNode.type === "screen"}>
-            Add Layout
-          </Button>
+          <Button type="submit">Add Layout</Button>
         </Box>
 
         <Alert status="success" variant="subtle" w="100%" bg="gray.200">

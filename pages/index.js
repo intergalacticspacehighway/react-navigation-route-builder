@@ -25,6 +25,19 @@ const findTreeNode = (tree, id) => {
   }
 };
 
+const findParentOfId = (tree, id) => {
+  for (let i = 0; i < tree.children.length; i++) {
+    const child = tree.children[i];
+    if (child.id === id) {
+      return tree;
+    }
+    const childNode = findParentOfId(tree.children[i], id);
+    if (childNode) {
+      return childNode;
+    }
+  }
+};
+
 export default function Home() {
   const iframeOrigin = "http://localhost:19006";
   const [iframeUrl, setIframeUrl] = useState(iframeOrigin);
@@ -42,6 +55,24 @@ export default function Home() {
       children: [],
       id: uuidv4(),
     });
+
+    setTreeData({
+      ...treeData,
+    });
+  };
+
+  const onEditNode = (node) => {
+    const parent = findParentOfId(treeData, selectedNodeId);
+    console.log("node ", parent, node);
+    parent.children = parent.children.map((child) => {
+      if (child.id === node.id) {
+        return node;
+      }
+
+      return child;
+    });
+
+    console.log("tree data ", treeData);
 
     setTreeData({
       ...treeData,
@@ -93,11 +124,6 @@ export default function Home() {
   const iframeRef = useRef(null);
 
   useEffect(() => {
-    // iframeRef.current.contentWindow.postMessage(
-    //   JSON.stringify({ command: "tree_update", data: treeData }),
-    //   "*"
-    // );
-
     window.onmessage = (e) => {
       console.log(e.data);
       if (e.data === "rnrb_listener_attached") {
@@ -112,10 +138,6 @@ export default function Home() {
   useEffect(() => {
     if (selectedNode.type === "screen") {
       setIframeUrl(iframeOrigin + "/" + selectedNode.route);
-      // iframeRef.current.contentWindow.postMessage(
-      //   JSON.stringify({ command: "navigate", data: "a" }),
-      //   "*"
-      // );
     }
   }, [selectedNode]);
 
@@ -144,7 +166,11 @@ export default function Home() {
 
         <Box>
           <VStack spacing={4}>
-            <AddLayout handleAddNode={onAddNode} selectedNode={selectedNode} />
+            <AddLayout
+              handleEditNode={onEditNode}
+              handleAddNode={onAddNode}
+              selectedNode={selectedNode}
+            />
             <Button onClick={handleSubmit}>Generate</Button>
           </VStack>
         </Box>
